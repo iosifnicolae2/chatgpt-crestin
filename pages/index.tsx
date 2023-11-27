@@ -12,10 +12,7 @@ export default function Home() {
     <>
       <Head>
         <title>ChatGPT Crestin</title>
-        <meta
-          name="description"
-          content="ChatGPT Crestin"
-        />
+        <meta name="description" content="ChatGPT Crestin" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>

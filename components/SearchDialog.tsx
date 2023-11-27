@@ -2,41 +2,33 @@
 
 import * as React from 'react'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { useCompletion } from 'ai/react'
-import { X, Loader, User, Frown, CornerDownLeft, Search, Wand } from 'lucide-react'
+import { Frown} from 'lucide-react'
 import { useRef } from 'react'
-import { parse } from "best-effort-json-parser";
+import { parse } from 'best-effort-json-parser'
 
 export function SearchDialog() {
   const [open, setOpen] = React.useState(false)
   const [completionSongs, setCompletionSongs] = React.useState([])
   const [query, setQuery] = React.useState<string>('')
 
-  const ref: any  = useRef(null);
+  const ref: any = useRef(null)
 
   const { complete, completion, isLoading, error } = useCompletion({
     api: '/api/vector-search',
-  });
-  console.log({completion})
+  })
+  console.log({ completion })
 
   React.useEffect(() => {
     try {
       setCompletionSongs(parse(completion).results)
-    }catch(e){}
+    } catch (e) {}
   }, [completion])
 
   React.useEffect(() => {
-    if(open) {
-      ref.current && ref.current.focus();
+    if (open) {
+      ref.current && ref.current.focus()
     }
   }, [open])
 
@@ -68,8 +60,8 @@ export function SearchDialog() {
   }
 
   return (
-    <div className={'flex flex-col'} style={{width: '700px'}}>
-      <form onSubmit={handleSubmit} className={"w-full"}>
+    <div className={'flex flex-col'} style={{ width: '700px' }}>
+      <form onSubmit={handleSubmit} className={'w-full'}>
         <div className="relative flex flex-row mb-8 w-full">
           <Input
             ref={ref}
@@ -80,41 +72,43 @@ export function SearchDialog() {
             className="col-span-3 w-full"
           />
           <Button type="submit" className="bg-black ml-2 px-6 min-w-fit" disabled={isLoading}>
-            {isLoading ? "Se incarca..": "Trimite"}
+            {isLoading ? 'Se incarca..' : 'Trimite'}
           </Button>
         </div>
-
       </form>
-
 
       {error && (
         <div className="flex items-center gap-4">
-                  <span className="bg-red-100 p-2 w-8 h-8 rounded-full text-center flex items-center justify-center">
-                    <Frown width={18} />
-                  </span>
+          <span className="bg-red-100 p-2 w-8 h-8 rounded-full text-center flex items-center justify-center">
+            <Frown width={18} />
+          </span>
           <span className="text-black">
-                    A apărut o eroare neașteptată. Vă rugăm să încercați din nou.
-                  </span>
+            A apărut o eroare neașteptată. Vă rugăm să încercați din nou.
+          </span>
         </div>
       )}
 
       {completionSongs && !error ? (
         <div className="flex flex-col items-start gap-4 dark:text-white">
-          <div className={"w-full"}>
+          <div className={'w-full'}>
             <div className="container mx-auto mt-2 w-full">
               <ul className="space-y-6 w-full">
                 {completionSongs?.map((song: any) => (
                   <li key={song['id']} className="bg-white p-6 rounded-lg w-full">
                     <a
                       className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                      href={song['number']? (
-                        `https://cantari-crestine.com/${song['id']?.replace('-', '').replace(/\d/g, '')}/${song['number']}`
-                      ): (
-                        `https://cantari-crestine.com/${song['id']?.replace('-', '/')}`
-                      )}
-                      target={"_blank"}
+                      href={
+                        song['number']
+                          ? `https://cantari-crestine.com/${song['id']
+                              ?.replace('-', '')
+                              .replace(/\d/g, '')}/${song['number']}`
+                          : `https://cantari-crestine.com/${song['id']?.replace('-', '/')}`
+                      }
+                      target={'_blank'}
                     >
-                      <h2 className="text-xl font-bold mb-2 w-full">{song['title']||"Necunoscut"}</h2>
+                      <h2 className="text-xl font-bold mb-2 w-full">
+                        {song['title'] || 'Necunoscut'}
+                      </h2>
                     </a>
                     <p className="text-gray-700 w-full">{song['reason']}</p>
                   </li>

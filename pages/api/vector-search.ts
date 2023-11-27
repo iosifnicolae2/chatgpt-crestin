@@ -84,15 +84,12 @@ export default async function handler(req: NextRequest) {
       data: [{ embedding }],
     }: CreateEmbeddingResponse = await embeddingResponse.json()
 
-    const { error: matchError, data: matchedSongs } = await supabaseClient.rpc(
-      'match_songs',
-      {
-        embedding,
-        match_threshold: 0.58,
-        match_count: 30,
-        min_content_length: 0,
-      }
-    )
+    const { error: matchError, data: matchedSongs } = await supabaseClient.rpc('match_songs', {
+      embedding,
+      match_threshold: 0.58,
+      match_count: 30,
+      min_content_length: 0,
+    })
 
     // console.log({matchedSongs})
 
@@ -107,7 +104,11 @@ export default async function handler(req: NextRequest) {
     for (let i = 0; i < matchedSongs.length; i++) {
       const song = matchedSongs[i]
       // const content = `id=${song.id||''},title=${song.title||''}`
-      const content = `id=${song.id||''},number=${song.info['number']||''},title=${song.title||''},categories=${song.categories?.join(',')||''},content=${song.content?.substring(0, 1000)||''}`
+      const content = `id=${song.id || ''},number=${song.info['number'] || ''},title=${
+        song.title || ''
+      },categories=${song.categories?.join(',') || ''},content=${
+        song.content?.substring(0, 1000) || ''
+      }`
       // const tokens = encoder.encode(content)
       // tokenCount += tokens.length;
       //
@@ -137,17 +138,18 @@ export default async function handler(req: NextRequest) {
 
     const completion = await openai.chat.completions.create({
       model: CHATGPT_MODEL,
-      messages: [{
-        role: 'user',
-        content: prompt,
-      }],
+      messages: [
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
       max_tokens: 512,
       temperature: 0.5,
-      response_format: { type: "json_object" },
+      response_format: { type: 'json_object' },
       stream: true,
-    });
+    })
     // console.log({completion})
-
 
     // if (!response.ok) {
     //   const error = await response.json()
@@ -155,9 +157,8 @@ export default async function handler(req: NextRequest) {
     // }
 
     // @ts-ignore
-    const stream = OpenAIStream(completion);
-    return new StreamingTextResponse(stream);
-
+    const stream = OpenAIStream(completion)
+    return new StreamingTextResponse(stream)
   } catch (err: unknown) {
     console.error(err)
     if (err instanceof UserError) {

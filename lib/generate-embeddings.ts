@@ -20,7 +20,7 @@ async function generateEmbeddings() {
     !process.env.OPENAI_KEY
   ) {
     return console.log(
-      'Environment variables NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, and OPENAI_KEY are required: skipping embeddings generation',
+      'Environment variables NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, and OPENAI_KEY are required: skipping embeddings generation'
     )
   }
 
@@ -32,13 +32,10 @@ async function generateEmbeddings() {
         persistSession: false,
         autoRefreshToken: false,
       },
-    },
+    }
   )
 
-  const { data, error } = await supabaseClient
-    .from('song')
-    .select()
-    .is('embedding', null);
+  const { data, error } = await supabaseClient.from('song').select().is('embedding', null)
 
   if (!data || error) {
     throw new Error(JSON.stringify({ error }))
@@ -49,21 +46,23 @@ async function generateEmbeddings() {
     apiKey: process.env.OPENAI_KEY,
   })
 
-  const batchSize = 100;
+  const batchSize = 100
   for (let i = 0; i < data.length; i += batchSize) {
     const batch = data.slice(i, i + batchSize)
 
-    const input = batch.map(song => {
-      return `title=${song['title']||''},categories=${song['categories']||''},content=${song['content']}`.replaceAll('\n', '')
+    const input = batch.map((song) => {
+      return `title=${song['title'] || ''},categories=${song['categories'] || ''},content=${
+        song['content']
+      }`.replaceAll('\n', '')
     })
     const embeddingResponse: any = await openai.embeddings.create({
       model: 'text-embedding-ada-002',
       input,
-    });
+    })
 
     for (let j = 0; j < batch.length; j++) {
-      const song = batch[j];
-      const embedding = embeddingResponse.data[j];
+      const song = batch[j]
+      const embedding = embeddingResponse.data[j]
 
       const r = await supabaseClient
         .from('song')
