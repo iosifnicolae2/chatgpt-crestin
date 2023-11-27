@@ -103,7 +103,7 @@ export function SearchDialog() {
           <div className={"w-full"}>
             <div className="container mx-auto mt-2 w-full">
               <ul className="space-y-6 w-full">
-                {completionSongs?.map(song => (
+                {completionSongs?.map((song: any) => (
                   <li key={song['id']} className="bg-white p-6 rounded-lg w-full">
                     <a
                       className="font-medium text-blue-600 dark:text-blue-500 hover:underline"

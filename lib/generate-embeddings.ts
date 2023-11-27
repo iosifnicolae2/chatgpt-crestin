@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import dotenv from 'dotenv'
 import yargs from 'yargs'
-import { Configuration, OpenAIApi } from 'openai-edge'
+import OpenAI from 'openai'
 
 dotenv.config()
 
@@ -45,10 +45,9 @@ async function generateEmbeddings() {
   }
   console.log(`Items to process: ${data.length}`)
 
-  const configuration = new Configuration({
+  const openai = new OpenAI({
     apiKey: process.env.OPENAI_KEY,
   })
-  const openai = new OpenAIApi(configuration)
 
   const batchSize = 100;
   for (let i = 0; i < data.length; i += batchSize) {
@@ -57,23 +56,23 @@ async function generateEmbeddings() {
     const input = batch.map(song => {
       return `title=${song['title']||''},categories=${song['categories']||''},content=${song['content']}`.replaceAll('\n', '')
     })
-    const embeddingResponse: any = await openai.createEmbedding({
+    const embeddingResponse: any = await openai.embeddings.create({
       model: 'text-embedding-ada-002',
       input,
-    })
+    });
 
     for (let j = 0; j < batch.length; j++) {
       const song = batch[j];
-      const embedding = embeddingResponse.data.data[j];
+      const embedding = embeddingResponse.data[j];
 
       const r = await supabaseClient
         .from('song')
         .update({
           embedding: embedding.embedding,
           embedding_info: {
-            model: embeddingResponse.data.model,
-            usage: embeddingResponse.data.usage,
-            object: embeddingResponse.data.object,
+            model: embeddingResponse.model,
+            usage: embeddingResponse.usage,
+            object: embeddingResponse.object,
           },
         })
         .eq('id', song['id'])
